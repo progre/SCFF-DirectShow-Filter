@@ -303,4 +303,12 @@ bool Form1::ValidateParameters() {
   return true;
 }
 
+/// @brief GUI‚Ìİ’è‚ğ”½‰f
+void Form1::ApplyParameters() {
+  if (ValidateParameters()) {
+    SendNativeLayoutRequest();
+  }
+}
+
+
 }   // namespace scffappnet

@@ -800,6 +800,8 @@ private: System::Windows::Forms::NumericUpDown^  area_clipping_x;
   void SendNullLayoutRequest();
   /// @brief 共有メモリにNativeLayoutリクエストを設定
   void SendNativeLayoutRequest();
+  /// @brief GUIの設定を反映
+  void ApplyParameters();
 
   //-------------------------------------------------------------------
 

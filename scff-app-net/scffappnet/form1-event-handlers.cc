@@ -49,9 +49,7 @@ System::Void Form1::splash_Click(System::Object^  sender, System::EventArgs^  e)
 }
 
 System::Void Form1::apply_Click(System::Object^  sender, System::EventArgs^  e) {
-  if (ValidateParameters()) {
-    SendNativeLayoutRequest();
-  }
+  ApplyParameters();
 }
 
 //-------------------------------------------------------------------

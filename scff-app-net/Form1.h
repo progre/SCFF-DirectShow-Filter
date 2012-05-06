@@ -735,6 +735,7 @@ private: System::Windows::Forms::NumericUpDown^  area_clipping_x;
     this->apply->TabIndex = 6;
     this->apply->Text = L"Apply";
     this->apply->UseVisualStyleBackColor = true;
+    this->apply->Visible = false;
     this->apply->Click += gcnew System::EventHandler(this, &Form1::apply_Click);
     // 
     // Form1

@@ -63,6 +63,7 @@ System::Void Form1::process_refresh_Click(System::Object^  sender, System::Event
 
 System::Void Form1::process_combo_SelectedIndexChanged(System::Object^  sender, System::EventArgs^  e) {
   Diagnostics::Debug::WriteLine("Index Changed");
+  ApplyParameters();
 }
 
 //-------------------------------------------------------------------
@@ -87,6 +88,7 @@ System::Void Form1::window_draghere_MouseUp(System::Object^  sender, System::Win
   if (window_handle != NULL) {
     // Œ©‚Â‚©‚Á‚½ê‡
     SetWindow(window_handle);
+    ApplyParameters();
     Diagnostics::Debug::WriteLine(location);
   } else {
     // nop
@@ -95,6 +97,7 @@ System::Void Form1::window_draghere_MouseUp(System::Object^  sender, System::Win
 
 System::Void Form1::window_desktop_Click(System::Object^  sender, System::EventArgs^  e) {
   DoCaptureDesktopWindow();
+  ApplyParameters();
 }
 
 //-------------------------------------------------------------------
@@ -115,26 +118,31 @@ System::Void Form1::area_fit_CheckedChanged(System::Object^  sender, System::Eve
     this->area_clipping_width->Enabled = true;
     this->area_clipping_height->Enabled = true;
   }
+  ApplyParameters();
 }
 
 System::Void Form1::area_clipping_x_ValueChanged(System::Object^  sender, System::EventArgs^  e) {
   this->layout_parameter_->clipping_x =
       static_cast<int32_t>(this->area_clipping_x->Value);
+  ApplyParameters();
 }
 
 System::Void Form1::area_clipping_y_ValueChanged(System::Object^  sender, System::EventArgs^  e) {
   this->layout_parameter_->clipping_y =
       static_cast<int32_t>(this->area_clipping_y->Value);
+  ApplyParameters();
 }
 
 System::Void Form1::area_clipping_width_ValueChanged(System::Object^  sender, System::EventArgs^  e) {
   this->layout_parameter_->clipping_width =
       static_cast<int32_t>(this->area_clipping_width->Value);
+  ApplyParameters();
 }
 
 System::Void Form1::area_clipping_height_ValueChanged(System::Object^  sender, System::EventArgs^  e) {
   this->layout_parameter_->clipping_height =
       static_cast<int32_t>(this->area_clipping_height->Value);
+  ApplyParameters();
 }
 
 System::Void Form1::target_area_select_Click(System::Object^  sender, System::EventArgs^  e) {
@@ -155,6 +163,7 @@ System::Void Form1::target_area_select_Click(System::Object^  sender, System::Ev
   this->area_clipping_y->Value = form->clipping_y;
   this->area_clipping_width->Value = form->clipping_width;
   this->area_clipping_height->Value = form->clipping_height;
+  ApplyParameters();
 }
 
 //-------------------------------------------------------------------
@@ -167,6 +176,7 @@ System::Void Form1::option_show_mouse_cursor_CheckedChanged(System::Object^  sen
   } else {
     this->layout_parameter_->show_cursor = 0;
   }
+  ApplyParameters();
 }
 
 System::Void Form1::option_show_layered_window_CheckedChanged(System::Object^  sender, System::EventArgs^  e) {
@@ -175,6 +185,7 @@ System::Void Form1::option_show_layered_window_CheckedChanged(System::Object^  s
   } else {
     this->layout_parameter_->show_layered_window = 0;
   }
+  ApplyParameters();
 }
 
 System::Void Form1::option_keep_aspect_ratio_CheckedChanged(System::Object^  sender, System::EventArgs^  e) {
@@ -183,6 +194,7 @@ System::Void Form1::option_keep_aspect_ratio_CheckedChanged(System::Object^  sen
   } else {
     this->layout_parameter_->keep_aspect_ratio = 0;
   }
+  ApplyParameters();
 }
 
 System::Void Form1::option_enable_enlargement_CheckedChanged(System::Object^  sender, System::EventArgs^  e) {
@@ -191,6 +203,7 @@ System::Void Form1::option_enable_enlargement_CheckedChanged(System::Object^  se
   } else {
     this->layout_parameter_->stretch = 0;
   }
+  ApplyParameters();
 }
 
 System::Void Form1::option_over_sampling_CheckedChanged(System::Object^  sender, System::EventArgs^  e) {
@@ -206,5 +219,6 @@ System::Void Form1::option_thread_num_ValueChanged(System::Object^  sender, Syst
 System::Void Form1::option_resize_method_combo_SelectedIndexChanged(System::Object^  sender, System::EventArgs^  e) {
   this->layout_parameter_->sws_flags =
       static_cast<int32_t>(this->option_resize_method_combo->SelectedValue);
+  ApplyParameters();
 }
 }   // namespace scffappnet

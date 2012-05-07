@@ -286,6 +286,17 @@ bool Form1::ValidateParameters() {
   return true;
 }
 
+/// @brief パラメータに問題がないか
+bool Form1::IsValidParameters() {
+  if (!IsValidWindow()) {
+    return false;
+  }
+  if (!IsValidClippingRegion()) {
+    return false;
+  }
+  return true;
+}
+
 /// @brief Windowのチェック
 bool Form1::IsValidWindow() {
   if (this->layout_parameter_->window == 0) { // NULL
@@ -320,7 +331,7 @@ bool Form1::IsValidClippingRegion() {
 
 /// @brief GUIの設定を反映
 void Form1::ApplyParameters() {
-  if (ValidateParameters()) {
+  if (IsValidParameters()) {
     SendNativeLayoutRequest();
   }
 }

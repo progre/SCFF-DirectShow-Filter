@@ -270,19 +270,37 @@ void Form1::SetWindow(HWND window_handle) {
 /// @brief パラメータのValidate
 bool Form1::ValidateParameters() {
   // もっとも危険な状態になりやすいウィンドウからチェック
-  if (this->layout_parameter_->window == 0) { // NULL
-    MessageBox::Show("Specified window is invalid", "Invalid Window",
-        MessageBoxButtons::OK, MessageBoxIcon::Error);
-    return false;
-  }
-  HWND window_handle = reinterpret_cast<HWND>(this->layout_parameter_->window);
-  if (!IsWindow(window_handle)) {
+  if (!IsValidWindow()) {
     MessageBox::Show("Specified window is invalid", "Invalid Window",
         MessageBoxButtons::OK, MessageBoxIcon::Error);
     return false;
   }
 
   // クリッピングリージョンの判定
+  if (!IsValidClippingRegion()) {
+    MessageBox::Show("Clipping region is invalid", "Invalid Clipping Region",
+        MessageBoxButtons::OK, MessageBoxIcon::Error);
+    return false;
+  }
+
+  return true;
+}
+
+/// @brief Windowのチェック
+bool Form1::IsValidWindow() {
+  if (this->layout_parameter_->window == 0) { // NULL
+    return false;
+  }
+  HWND window_handle = reinterpret_cast<HWND>(this->layout_parameter_->window);
+  if (!IsWindow(window_handle)) {
+    return false;
+  }
+  return true;
+}
+
+/// @brief クリッピングリージョンのチェック
+bool Form1::IsValidClippingRegion() {
+  HWND window_handle = reinterpret_cast<HWND>(this->layout_parameter_->window);
   RECT window_rect;
   GetClientRect(window_handle,&window_rect);
   if (this->layout_parameter_->clipping_x +
@@ -293,14 +311,11 @@ bool Form1::ValidateParameters() {
       <= window_rect.bottom &&
       this->layout_parameter_->clipping_width > 0 &&
       this->layout_parameter_->clipping_height > 0) {
-    // nop 問題なし
+    // 問題なし
+    return true;
   } else {
-    MessageBox::Show("Clipping region is invalid", "Invalid Clipping Region",
-        MessageBoxButtons::OK, MessageBoxIcon::Error);
     return false;
   }
-
-  return true;
 }
 
 /// @brief GUIの設定を反映

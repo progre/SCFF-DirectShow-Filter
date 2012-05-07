@@ -820,6 +820,10 @@ private: System::Windows::Forms::NumericUpDown^  area_clipping_x;
 
   /// @brief パラメータのValidate
   bool ValidateParameters();
+  /// @brief Windowのチェック
+  bool IsValidWindow();
+  /// @brief クリッピングリージョンのチェック
+  bool IsValidClippingRegion();
 
   //-------------------------------------------------------------------
 

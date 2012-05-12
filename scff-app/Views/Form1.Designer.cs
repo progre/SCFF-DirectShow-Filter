@@ -1,4 +1,4 @@
-﻿namespace scff_app
+﻿namespace ScffApp.Views
 {
     partial class Form1
     {

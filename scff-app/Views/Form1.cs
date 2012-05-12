@@ -1,4 +1,5 @@
-﻿// Copyright 2012 Progre <djyayutto_at_gmail.com>
+﻿
+// Copyright 2012 Progre <djyayutto_at_gmail.com>
 //
 // This file is part of SCFF DSF.
 //
@@ -29,7 +30,7 @@ using System.Collections;
 using System.Runtime.InteropServices;
 using scff_interprocess;
 
-namespace scff_app
+namespace ScffApp.Views
 {
     public partial class Form1 : Form
     {

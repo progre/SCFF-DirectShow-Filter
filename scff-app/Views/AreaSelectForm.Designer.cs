@@ -1,4 +1,4 @@
-﻿namespace scff_app
+﻿namespace ScffApp
 {
     partial class AreaSelectForm
     {

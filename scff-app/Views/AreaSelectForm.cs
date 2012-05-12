@@ -1,4 +1,5 @@
-﻿// Copyright 2012 Progre <djyayutto_at_gmail.com>
+﻿
+// Copyright 2012 Progre <djyayutto_at_gmail.com>
 //
 // This file is part of SCFF DSF.
 //
@@ -24,7 +25,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 
-namespace scff_app
+namespace ScffApp.Views
 {
     public partial class AreaSelectForm : Form
     {

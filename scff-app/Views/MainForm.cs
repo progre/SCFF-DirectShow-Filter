@@ -66,27 +66,13 @@ namespace ScffApp.Views
         {
             base.OnClosed(e);
 
-            DWMAPIRestore();
+            viewModel.DWMAPIRestore();
         }
 
         /// 共有メモリからディレクトリを取得し、いろいろ処理
         private void UpdateDirectory()
         {
-            // 共有メモリからデータを取得
-            viewModel.interprocess_.InitDirectory();
-            Interprocess.Directory directory;
-            viewModel.interprocess_.GetDirectory(out directory);
-
-            // リストを新しく作成する
-            ArrayList managed_directory = new ArrayList();
-
-            // コンボボックスの内容を構築
-            for (int i = 0; i < Interprocess.kMaxEntry; i++)
-            {
-                if (directory.entries[i].process_id == 0) continue;
-                ManagedEntry entry = new ManagedEntry(directory.entries[i]);
-                managed_directory.Add(entry);
-            }
+            ArrayList managed_directory = viewModel.GetManagedDirectory();
             process_combo.DataSource = managed_directory;
 
             if (managed_directory.Count > 0)
@@ -145,18 +131,7 @@ namespace ScffApp.Views
         private void BuildResizeMethodCombobox()
         {
             // リストを新しく作成する
-            ArrayList resize_methods = new ArrayList();
-            resize_methods.Add(new ResizeMethod("FastBilinear (fast bilinear)", Interprocess.SWScaleFlags.kFastBilinear));
-            resize_methods.Add(new ResizeMethod("Bilinear (bilinear)", Interprocess.SWScaleFlags.kBilinear));
-            resize_methods.Add(new ResizeMethod("Bicubic (bicubic)", Interprocess.SWScaleFlags.kBicubic));
-            resize_methods.Add(new ResizeMethod("X (experimental)", Interprocess.SWScaleFlags.kX));
-            resize_methods.Add(new ResizeMethod("Point (nearest neighbor)", Interprocess.SWScaleFlags.kPoint));
-            resize_methods.Add(new ResizeMethod("Area (averaging area)", Interprocess.SWScaleFlags.kArea));
-            resize_methods.Add(new ResizeMethod("Bicublin (luma bicubic, chroma bilinear)", Interprocess.SWScaleFlags.kBicublin));
-            resize_methods.Add(new ResizeMethod("Gauss (gaussian)", Interprocess.SWScaleFlags.kGauss));
-            resize_methods.Add(new ResizeMethod("Sinc (sinc)", Interprocess.SWScaleFlags.kSinc));
-            resize_methods.Add(new ResizeMethod("Lanczos (natural)", Interprocess.SWScaleFlags.kLanczos));
-            resize_methods.Add(new ResizeMethod("Spline (natural bicubic spline)", Interprocess.SWScaleFlags.kSpline));
+            ArrayList resize_methods = viewModel.GetResizeMethods();
             option_resize_method_combo.DataSource = resize_methods;
             option_resize_method_combo.DisplayMember = "MethodName";
             //option_resize_method_combo.ValueMember = "SWScaleFlags";
@@ -248,60 +223,22 @@ namespace ScffApp.Views
         private static extern int DwmEnableComposition(uint uCompositionAction);
         const int DWM_EC_DISABLECOMPOSITION = 0;
         const int DWM_EC_ENABLECOMPOSITION = 1;
+
         /// Dwmapi.dllを利用してAeroをOffに
         private void DWMAPIOff()
         {
-            if (!viewModel.can_use_dwmapi_dll_)
-            {
-                // dwmapi.dllを利用できなければ何もしない
-                viewModel.was_dwm_enabled_on_start_ = false;
-                return;
-            }
-
-            bool was_dwm_enabled_on_start;
-            DwmIsCompositionEnabled(out was_dwm_enabled_on_start);
-            if (was_dwm_enabled_on_start)
-            {
-                //DwmEnableComposition(DWM_EC_DISABLECOMPOSITION);
-            }
-            else
-            {
-            }
+            viewModel.DWMAPIOff();
             aero_on_item.Checked = false;
-            viewModel.was_dwm_enabled_on_start_ = was_dwm_enabled_on_start == true;
         }
         /// 強制的にAeroのOn/Offを切り替える
         private void DWMAPIFlip()
         {
-            if (!viewModel.can_use_dwmapi_dll_)
+            if (!viewModel.DWMAPIFlip(aero_on_item.Checked))
             {
                 // dwmapi.dllを利用できなければ何もしない
                 return;
-            }
-
-            if (aero_on_item.Checked)
-            {
-                DwmEnableComposition(DWM_EC_DISABLECOMPOSITION);
-            }
-            else
-            {
-                DwmEnableComposition(DWM_EC_ENABLECOMPOSITION);
             }
             aero_on_item.Checked = !(aero_on_item.Checked);
-        }
-        /// AeroをOffにしていたらOnに戻す
-        private void DWMAPIRestore()
-        {
-            if (!viewModel.can_use_dwmapi_dll_)
-            {
-                // dwmapi.dllを利用できなければ何もしない
-                return;
-            }
-
-            if (viewModel.was_dwm_enabled_on_start_)
-            {
-                DwmEnableComposition(DWM_EC_ENABLECOMPOSITION);
-            }
         }
         //-------------------------------------------------------------------
 

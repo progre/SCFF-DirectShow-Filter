@@ -7,6 +7,7 @@ using ScffApp.Commons.ViewModels;
 using scff_interprocess;
 using System.Windows.Forms;
 using System.Runtime.InteropServices;
+using System.Collections;
 
 namespace ScffApp.ViewModels
 {
@@ -221,6 +222,104 @@ namespace ScffApp.ViewModels
             // 共有メモリを開いて送る
             interprocess_.InitMessage(processId);
             interprocess_.SendMessage(message);
+        }
+
+        public ArrayList GetResizeMethods()
+        {
+            ArrayList resize_methods = new ArrayList();
+            resize_methods.Add(new ResizeMethod("FastBilinear (fast bilinear)", Interprocess.SWScaleFlags.kFastBilinear));
+            resize_methods.Add(new ResizeMethod("Bilinear (bilinear)", Interprocess.SWScaleFlags.kBilinear));
+            resize_methods.Add(new ResizeMethod("Bicubic (bicubic)", Interprocess.SWScaleFlags.kBicubic));
+            resize_methods.Add(new ResizeMethod("X (experimental)", Interprocess.SWScaleFlags.kX));
+            resize_methods.Add(new ResizeMethod("Point (nearest neighbor)", Interprocess.SWScaleFlags.kPoint));
+            resize_methods.Add(new ResizeMethod("Area (averaging area)", Interprocess.SWScaleFlags.kArea));
+            resize_methods.Add(new ResizeMethod("Bicublin (luma bicubic, chroma bilinear)", Interprocess.SWScaleFlags.kBicublin));
+            resize_methods.Add(new ResizeMethod("Gauss (gaussian)", Interprocess.SWScaleFlags.kGauss));
+            resize_methods.Add(new ResizeMethod("Sinc (sinc)", Interprocess.SWScaleFlags.kSinc));
+            resize_methods.Add(new ResizeMethod("Lanczos (natural)", Interprocess.SWScaleFlags.kLanczos));
+            resize_methods.Add(new ResizeMethod("Spline (natural bicubic spline)", Interprocess.SWScaleFlags.kSpline));
+            return resize_methods;
+        }
+
+        [DllImport("dwmapi.dll")]
+        private static extern int DwmIsCompositionEnabled(out bool enabled);
+        [DllImport("dwmapi.dll")]
+        private static extern int DwmEnableComposition(uint uCompositionAction);
+        const int DWM_EC_DISABLECOMPOSITION = 0;
+        const int DWM_EC_ENABLECOMPOSITION = 1;
+        /// Dwmapi.dllを利用してAeroをOffに
+        public void DWMAPIOff()
+        {
+            if (!can_use_dwmapi_dll_)
+            {
+                // dwmapi.dllを利用できなければ何もしない
+                was_dwm_enabled_on_start_ = false;
+                return;
+            }
+
+            bool was_dwm_enabled_on_start;
+            DwmIsCompositionEnabled(out was_dwm_enabled_on_start);
+            if (was_dwm_enabled_on_start)
+            {
+                //DwmEnableComposition(DWM_EC_DISABLECOMPOSITION);
+            }
+            else
+            {
+            }
+            was_dwm_enabled_on_start_ = was_dwm_enabled_on_start == true;
+        }
+        /// 強制的にAeroのOn/Offを切り替える
+        public bool DWMAPIFlip(bool isChecked)
+        {
+            if (!can_use_dwmapi_dll_)
+            {
+                // dwmapi.dllを利用できなければ何もしない
+                return false;
+            }
+
+            if (isChecked)
+            {
+                DwmEnableComposition(DWM_EC_DISABLECOMPOSITION);
+            }
+            else
+            {
+                DwmEnableComposition(DWM_EC_ENABLECOMPOSITION);
+            }
+            return true;
+        }
+        /// AeroをOffにしていたらOnに戻す
+        public void DWMAPIRestore()
+        {
+            if (!can_use_dwmapi_dll_)
+            {
+                // dwmapi.dllを利用できなければ何もしない
+                return;
+            }
+
+            if (was_dwm_enabled_on_start_)
+            {
+                DwmEnableComposition(DWM_EC_ENABLECOMPOSITION);
+            }
+        }
+
+        public ArrayList GetManagedDirectory()
+        {
+            // 共有メモリからデータを取得
+            interprocess_.InitDirectory();
+            Interprocess.Directory directory;
+            interprocess_.GetDirectory(out directory);
+
+            // リストを新しく作成する
+            ArrayList managed_directory = new ArrayList();
+
+            // コンボボックスの内容を構築
+            for (int i = 0; i < Interprocess.kMaxEntry; i++)
+            {
+                if (directory.entries[i].process_id == 0) continue;
+                ManagedEntry entry = new ManagedEntry(directory.entries[i]);
+                managed_directory.Add(entry);
+            }
+            return managed_directory;
         }
 
         public Interprocess.LayoutParameter GetCurrentLayoutParameter()

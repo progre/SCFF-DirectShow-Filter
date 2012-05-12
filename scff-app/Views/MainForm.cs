@@ -69,20 +69,6 @@ namespace ScffApp.Views
             DWMAPIRestore();
         }
 
-        // enum格納用
-        // Tupleの動作が不安定との情報を聞いたのでしょうがなく作った
-        class ResizeMethod
-        {
-            public
-            ResizeMethod(String name, Interprocess.SWScaleFlags flags)
-            {
-                MethodName = name;
-                SWScaleFlags = flags;
-            }
-            public String MethodName;
-            public Interprocess.SWScaleFlags SWScaleFlags;
-        }
-
         /// 共有メモリからディレクトリを取得し、いろいろ処理
         private void UpdateDirectory()
         {
@@ -125,103 +111,31 @@ namespace ScffApp.Views
                 apply.Enabled = false;
             }
         }
-        /// 共有メモリにNullLayoutリクエストを設定
+
         private void SendNullLayoutRequest()
         {
-            // メッセージを書いて送る
-            Interprocess.Message message = new Interprocess.Message();
-            message.timestamp = DateTime.Now.Ticks;
-            message.layout_type = (int)Interprocess.LayoutType.kNullLayout;
-
-            // 共有メモリを開いて送る
             if (process_combo.SelectedValue != null)
             {
-                var process_id = (uint)((ManagedEntry)process_combo.SelectedItem).ProcessID;
-                viewModel.interprocess_.InitMessage(process_id);
-                viewModel.interprocess_.SendMessage(message);
+                viewModel.SendNullLayoutRequest((uint)((ManagedEntry)process_combo.SelectedItem).ProcessID);
             }
         }
-        /// 共有メモリにNativeLayoutリクエストを設定
+
         private void SendNativeLayoutRequest()
         {
-            // メッセージを書いて送る
-            Interprocess.Message message = new Interprocess.Message();
-            message.timestamp = DateTime.Now.Ticks;
-            message.layout_type = (int)Interprocess.LayoutType.kNativeLayout;
-            // 無視される
-            message.layout_element_count = 1;
-            message.layout_parameters = new Interprocess.LayoutParameter[Interprocess.kMaxComplexLayoutElements];
-            message.layout_parameters[0].bound_x = 0;
-            message.layout_parameters[0].bound_y = 0;
-            message.layout_parameters[0].bound_width = 0;
-            message.layout_parameters[0].bound_height = 0;
-            // ここまで無視
-            message.layout_parameters[0].window = GetCurrentLayoutParameter().window;
-            message.layout_parameters[0].clipping_x = GetCurrentLayoutParameter().clipping_x;
-            message.layout_parameters[0].clipping_y = GetCurrentLayoutParameter().clipping_y;
-            message.layout_parameters[0].clipping_width = GetCurrentLayoutParameter().clipping_width;
-            message.layout_parameters[0].clipping_height = GetCurrentLayoutParameter().clipping_height;
-            message.layout_parameters[0].show_cursor = GetCurrentLayoutParameter().show_cursor;
-            message.layout_parameters[0].show_layered_window = GetCurrentLayoutParameter().show_layered_window;
-            message.layout_parameters[0].sws_flags = GetCurrentLayoutParameter().sws_flags;
-            message.layout_parameters[0].stretch = GetCurrentLayoutParameter().stretch;
-            message.layout_parameters[0].keep_aspect_ratio = GetCurrentLayoutParameter().keep_aspect_ratio;
-
             // 共有メモリを開いて送る
             if (process_combo.SelectedValue != null)
             {
-                var process_id = (uint)((ManagedEntry)(process_combo.SelectedItem)).ProcessID;
-                viewModel.interprocess_.InitMessage(process_id);
-                viewModel.interprocess_.SendMessage(message);
+                viewModel.SendNativeLayoutRequest((uint)((ManagedEntry)(process_combo.SelectedItem)).ProcessID);
             }
         }
+
         /// 共有メモリにComplexLayoutリクエストを設定
         private void SendComplexLayoutRequest()
         {
-            // todo(Alalf) テスト中！あとで直す！
-
-            // メッセージを書いて送る
-            Interprocess.Message message = new Interprocess.Message();
-            message.timestamp = DateTime.Now.Ticks;
-            message.layout_type = (int)Interprocess.LayoutType.kComplexLayout;
-            message.layout_element_count = 2;
-            // 1個目の取り込み範囲
-            message.layout_parameters[0].bound_x = 32;
-            message.layout_parameters[0].bound_y = 32;
-            message.layout_parameters[0].bound_width = 320;
-            message.layout_parameters[0].bound_height = 240;
-            message.layout_parameters[0].window = (ulong)(GetDesktopWindow());
-            message.layout_parameters[0].clipping_x = 0;
-            message.layout_parameters[0].clipping_y = 0;
-            message.layout_parameters[0].clipping_width = 1000;
-            message.layout_parameters[0].clipping_height = 500;
-            message.layout_parameters[0].show_cursor = 0;
-            message.layout_parameters[0].show_layered_window = 0;
-            message.layout_parameters[0].sws_flags = (int)Interprocess.SWScaleFlags.kLanczos;
-            message.layout_parameters[0].stretch = 1;
-            message.layout_parameters[0].keep_aspect_ratio = 1;
-            // 2個目の取り込み範囲
-            message.layout_parameters[1].bound_x = 300;
-            message.layout_parameters[1].bound_y = 0;
-            message.layout_parameters[1].bound_width = 300;
-            message.layout_parameters[1].bound_height = 100;
-            message.layout_parameters[1].window = (ulong)(GetDesktopWindow());
-            message.layout_parameters[1].clipping_x = 320;
-            message.layout_parameters[1].clipping_y = 320;
-            message.layout_parameters[1].clipping_width = 200;
-            message.layout_parameters[1].clipping_height = 200;
-            message.layout_parameters[1].show_cursor = 0;
-            message.layout_parameters[1].show_layered_window = 0;
-            message.layout_parameters[1].sws_flags = (int)Interprocess.SWScaleFlags.kLanczos;
-            message.layout_parameters[1].stretch = 1;
-            message.layout_parameters[1].keep_aspect_ratio = 1;
-
             // 共有メモリを開いて送る
             if (process_combo.SelectedValue != null)
             {
-                var process_id = (uint)(process_combo.SelectedValue);
-                viewModel.interprocess_.InitMessage(process_id);
-                viewModel.interprocess_.SendMessage(message);
+                viewModel.SendComplexLayoutRequest((uint)(process_combo.SelectedValue));
             }
         }
 
@@ -296,7 +210,7 @@ namespace ScffApp.Views
         private void ResetClippingRegion()
         {
             IntPtr window_handle =
-                (IntPtr)GetCurrentLayoutParameter().window;
+                (IntPtr)viewModel.GetCurrentLayoutParameter().window;
 
             if (window_handle == null || !IsWindow(window_handle))
             {
@@ -324,48 +238,6 @@ namespace ScffApp.Views
             viewModel.layout1_parameter_.clipping_y = window_rect.top;
             viewModel.layout1_parameter_.clipping_width = window_rect.right;
             viewModel.layout1_parameter_.clipping_height = window_rect.bottom;
-        }
-
-        /// パラメータのValidate
-        private bool ValidateParameters()
-        {
-            // もっとも危険な状態になりやすいウィンドウからチェック
-            if (GetCurrentLayoutParameter().window == 0)
-            { // NULL
-                MessageBox.Show("Specified window is invalid", "Invalid Window",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return false;
-            }
-            var window_handle = (IntPtr)(GetCurrentLayoutParameter().window);
-            if (!IsWindow(window_handle))
-            {
-                MessageBox.Show("Specified window is invalid", "Invalid Window",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return false;
-            }
-
-            // クリッピングリージョンの判定
-            RECT window_rect;
-            GetClientRect(window_handle, out window_rect);
-            if (GetCurrentLayoutParameter().clipping_x +
-                GetCurrentLayoutParameter().clipping_width
-                <= window_rect.right &&
-                GetCurrentLayoutParameter().clipping_y +
-                GetCurrentLayoutParameter().clipping_height
-                <= window_rect.bottom &&
-                GetCurrentLayoutParameter().clipping_width > 0 &&
-                GetCurrentLayoutParameter().clipping_height > 0)
-            {
-                // nop 問題なし
-            }
-            else
-            {
-                MessageBox.Show("Clipping region is invalid", "Invalid Clipping Region",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return false;
-            }
-
-            return true;
         }
 
         //-------------------------------------------------------------------
@@ -433,36 +305,6 @@ namespace ScffApp.Views
         }
         //-------------------------------------------------------------------
 
-        private Interprocess.LayoutParameter GetLayoutParameterByIndex(int index)
-        {
-            switch (index)
-            {
-                case 0:
-                    return viewModel.layout1_parameter_;
-                case 1:
-                    return viewModel.layout2_parameter_;
-                case 2:
-                    return viewModel.layout3_parameter_;
-                case 3:
-                    return viewModel.layout4_parameter_;
-                case 4:
-                    return viewModel.layout5_parameter_;
-                case 5:
-                    return viewModel.layout6_parameter_;
-                case 6:
-                    return viewModel.layout7_parameter_;
-                case 7:
-                    return viewModel.layout8_parameter_;
-                default:
-                    throw new ArgumentException();
-            }
-        }
-
-        Interprocess.LayoutParameter GetCurrentLayoutParameter()
-        {
-            return GetLayoutParameterByIndex(viewModel.editing_layout_index_);
-        }
-
         private void aero_on_item_Click(object sender, EventArgs e)
         {
             DWMAPIFlip();
@@ -502,7 +344,7 @@ namespace ScffApp.Views
         }
         private void apply_Click(object sender, EventArgs e)
         {
-            if (ValidateParameters())
+            if (viewModel.ValidateParameters())
             {
                 SendNativeLayoutRequest();
             }
@@ -628,7 +470,7 @@ namespace ScffApp.Views
         }
         private void layout_layout_Click(object sender, EventArgs e)
         {
-            if (ValidateParameters())
+            if (viewModel.ValidateParameters())
             {
                 SendComplexLayoutRequest();
             }

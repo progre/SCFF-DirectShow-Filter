@@ -37,25 +37,6 @@ namespace ScffApp.Views
     {
         private MainViewModel viewModel;
 
-        [DllImport("kernel32")]
-        private static extern bool GetVersionEx(ref OSVERSIONINFO osvi);
-        [StructLayout(LayoutKind.Sequential)]
-        class OSVERSIONINFO
-        {
-            public uint dwOSVersionInfoSize;
-            public uint dwMajorVersion;
-            public uint dwMinorVersion;
-            public uint dwBuildNumber;
-            public uint dwPlatformId;
-            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 128)]
-            public string szCSDVersion;
-            public Int16 wServicePackMajor;
-            public Int16 wServicePackMinor;
-            public Int16 wSuiteMask;
-            public Byte wProductType;
-            public Byte wReserved;
-        }
-
         public MainForm()
         {
             viewModel = new MainViewModel();
@@ -64,35 +45,35 @@ namespace ScffApp.Views
 
             mainViewModelBindingSource.Add(viewModel);
 
-            can_use_dwmapi_dll_ = false;
-            was_dwm_enabled_on_start_ = false;
-            interprocess_ = null;
+            viewModel.can_use_dwmapi_dll_ = false;
+            viewModel.was_dwm_enabled_on_start_ = false;
+            viewModel.interprocess_ = null;
 
             // DWMAPI.DLLが利用可能かどうか調べる
             if (System.Environment.OSVersion.Platform == PlatformID.Win32NT && System.Environment.OSVersion.Version.Major >= 6)
             {
-                can_use_dwmapi_dll_ = true;
+                viewModel.can_use_dwmapi_dll_ = true;
             }
 
             // プロセス間通信に必要なオブジェクトの生成
-            interprocess_ = new Interprocess();
+            viewModel.interprocess_ = new Interprocess();
             // レイアウトパラメータを格納するためのオブジェクトを生成
-            layout1_parameter_ = new Interprocess.LayoutParameter();
-            layout2_parameter_ = new Interprocess.LayoutParameter();
-            layout3_parameter_ = new Interprocess.LayoutParameter();
-            layout4_parameter_ = new Interprocess.LayoutParameter();
-            layout5_parameter_ = new Interprocess.LayoutParameter();
-            layout6_parameter_ = new Interprocess.LayoutParameter();
-            layout7_parameter_ = new Interprocess.LayoutParameter();
-            layout8_parameter_ = new Interprocess.LayoutParameter();
+            viewModel.layout1_parameter_ = new Interprocess.LayoutParameter();
+            viewModel.layout2_parameter_ = new Interprocess.LayoutParameter();
+            viewModel.layout3_parameter_ = new Interprocess.LayoutParameter();
+            viewModel.layout4_parameter_ = new Interprocess.LayoutParameter();
+            viewModel.layout5_parameter_ = new Interprocess.LayoutParameter();
+            viewModel.layout6_parameter_ = new Interprocess.LayoutParameter();
+            viewModel.layout7_parameter_ = new Interprocess.LayoutParameter();
+            viewModel.layout8_parameter_ = new Interprocess.LayoutParameter();
 
             // コントロールの準備
             BuildResizeMethodCombobox();
 
             // 編集中のレイアウトインデックス
-            editing_layout_index_ = 0;
+            viewModel.editing_layout_index_ = 0;
             // ListViewを選択する
-            layout_list.Items[editing_layout_index_].Selected = true;
+            layout_list.Items[viewModel.editing_layout_index_].Selected = true;
             layout_list.Select();
 
             // ディレクトリ取得
@@ -130,9 +111,9 @@ namespace ScffApp.Views
         private void UpdateDirectory()
         {
             // 共有メモリからデータを取得
-            interprocess_.InitDirectory();
+            viewModel.interprocess_.InitDirectory();
             Interprocess.Directory directory;
-            interprocess_.GetDirectory(out directory);
+            viewModel.interprocess_.GetDirectory(out directory);
 
             // リストを新しく作成する
             ArrayList managed_directory = new ArrayList();
@@ -180,8 +161,8 @@ namespace ScffApp.Views
             if (process_combo.SelectedValue != null)
             {
                 var process_id = (uint)((ManagedEntry)process_combo.SelectedItem).ProcessID;
-                interprocess_.InitMessage(process_id);
-                interprocess_.SendMessage(message);
+                viewModel.interprocess_.InitMessage(process_id);
+                viewModel.interprocess_.SendMessage(message);
             }
         }
         /// 共有メモリにNativeLayoutリクエストを設定
@@ -214,8 +195,8 @@ namespace ScffApp.Views
             if (process_combo.SelectedValue != null)
             {
                 var process_id = (uint)((ManagedEntry)(process_combo.SelectedItem)).ProcessID;
-                interprocess_.InitMessage(process_id);
-                interprocess_.SendMessage(message);
+                viewModel.interprocess_.InitMessage(process_id);
+                viewModel.interprocess_.SendMessage(message);
             }
         }
         /// 共有メモリにComplexLayoutリクエストを設定
@@ -263,8 +244,8 @@ namespace ScffApp.Views
             if (process_combo.SelectedValue != null)
             {
                 var process_id = (uint)(process_combo.SelectedValue);
-                interprocess_.InitMessage(process_id);
-                interprocess_.SendMessage(message);
+                viewModel.interprocess_.InitMessage(process_id);
+                viewModel.interprocess_.SendMessage(message);
             }
         }
 
@@ -300,7 +281,7 @@ namespace ScffApp.Views
         /// ウィンドウを指定する
         private void SetWindow(IntPtr window_handle)
         {
-            layout1_parameter_.window = (ulong)window_handle;
+            viewModel.layout1_parameter_.window = (ulong)window_handle;
 
             if (window_handle == null)
             {
@@ -363,10 +344,10 @@ namespace ScffApp.Views
             area_clipping_width.Value = window_rect.right;
             area_clipping_height.Value = window_rect.bottom;
 
-            layout1_parameter_.clipping_x = window_rect.left;
-            layout1_parameter_.clipping_y = window_rect.top;
-            layout1_parameter_.clipping_width = window_rect.right;
-            layout1_parameter_.clipping_height = window_rect.bottom;
+            viewModel.layout1_parameter_.clipping_x = window_rect.left;
+            viewModel.layout1_parameter_.clipping_y = window_rect.top;
+            viewModel.layout1_parameter_.clipping_width = window_rect.right;
+            viewModel.layout1_parameter_.clipping_height = window_rect.bottom;
         }
 
         /// パラメータのValidate
@@ -422,10 +403,10 @@ namespace ScffApp.Views
         /// Dwmapi.dllを利用してAeroをOffに
         private void DWMAPIOff()
         {
-            if (!can_use_dwmapi_dll_)
+            if (!viewModel.can_use_dwmapi_dll_)
             {
                 // dwmapi.dllを利用できなければ何もしない
-                was_dwm_enabled_on_start_ = false;
+                viewModel.was_dwm_enabled_on_start_ = false;
                 return;
             }
 
@@ -439,12 +420,12 @@ namespace ScffApp.Views
             {
             }
             aero_on_item.Checked = false;
-            was_dwm_enabled_on_start_ = was_dwm_enabled_on_start == true;
+            viewModel.was_dwm_enabled_on_start_ = was_dwm_enabled_on_start == true;
         }
         /// 強制的にAeroのOn/Offを切り替える
         private void DWMAPIFlip()
         {
-            if (!can_use_dwmapi_dll_)
+            if (!viewModel.can_use_dwmapi_dll_)
             {
                 // dwmapi.dllを利用できなければ何もしない
                 return;
@@ -463,49 +444,39 @@ namespace ScffApp.Views
         /// AeroをOffにしていたらOnに戻す
         private void DWMAPIRestore()
         {
-            if (!can_use_dwmapi_dll_)
+            if (!viewModel.can_use_dwmapi_dll_)
             {
                 // dwmapi.dllを利用できなければ何もしない
                 return;
             }
 
-            if (was_dwm_enabled_on_start_)
+            if (viewModel.was_dwm_enabled_on_start_)
             {
                 DwmEnableComposition(DWM_EC_ENABLECOMPOSITION);
             }
         }
-        /// Dwmapi.dllが利用可能かどうか
-        private bool can_use_dwmapi_dll_;
-        /// Aeroが起動時にONになっていたかどうか
-        private bool was_dwm_enabled_on_start_;
-
         //-------------------------------------------------------------------
-
-        /// プロセス間通信用オブジェクト
-        private Interprocess interprocess_;
-        /// 現在編集中のレイアウト番号
-        private int editing_layout_index_;
 
         private Interprocess.LayoutParameter GetLayoutParameterByIndex(int index)
         {
             switch (index)
             {
                 case 0:
-                    return layout1_parameter_;
+                    return viewModel.layout1_parameter_;
                 case 1:
-                    return layout2_parameter_;
+                    return viewModel.layout2_parameter_;
                 case 2:
-                    return layout3_parameter_;
+                    return viewModel.layout3_parameter_;
                 case 3:
-                    return layout4_parameter_;
+                    return viewModel.layout4_parameter_;
                 case 4:
-                    return layout5_parameter_;
+                    return viewModel.layout5_parameter_;
                 case 5:
-                    return layout6_parameter_;
+                    return viewModel.layout6_parameter_;
                 case 6:
-                    return layout7_parameter_;
+                    return viewModel.layout7_parameter_;
                 case 7:
-                    return layout8_parameter_;
+                    return viewModel.layout8_parameter_;
                 default:
                     throw new ArgumentException();
             }
@@ -513,18 +484,8 @@ namespace ScffApp.Views
 
         Interprocess.LayoutParameter GetCurrentLayoutParameter()
         {
-            return GetLayoutParameterByIndex(editing_layout_index_);
+            return GetLayoutParameterByIndex(viewModel.editing_layout_index_);
         }
-
-        /// レイアウトパラメータ1
-        Interprocess.LayoutParameter layout1_parameter_ = new Interprocess.LayoutParameter();
-        Interprocess.LayoutParameter layout2_parameter_ = new Interprocess.LayoutParameter();
-        Interprocess.LayoutParameter layout3_parameter_ = new Interprocess.LayoutParameter();
-        Interprocess.LayoutParameter layout4_parameter_ = new Interprocess.LayoutParameter();
-        Interprocess.LayoutParameter layout5_parameter_ = new Interprocess.LayoutParameter();
-        Interprocess.LayoutParameter layout6_parameter_ = new Interprocess.LayoutParameter();
-        Interprocess.LayoutParameter layout7_parameter_ = new Interprocess.LayoutParameter();
-        Interprocess.LayoutParameter layout8_parameter_ = new Interprocess.LayoutParameter();
 
         private void aero_on_item_Click(object sender, EventArgs e)
         {
@@ -598,72 +559,72 @@ namespace ScffApp.Views
         }
         private void area_clipping_x_ValueChanged(object sender, EventArgs e)
         {
-            layout1_parameter_.clipping_x = (int)area_clipping_x.Value;
+            viewModel.layout1_parameter_.clipping_x = (int)area_clipping_x.Value;
         }
         private void area_clipping_y_ValueChanged(object sender, EventArgs e)
         {
-            layout1_parameter_.clipping_y = (int)area_clipping_y.Value;
+            viewModel.layout1_parameter_.clipping_y = (int)area_clipping_y.Value;
         }
         private void area_clipping_width_ValueChanged(object sender, EventArgs e)
         {
-            layout1_parameter_.clipping_width =
+            viewModel.layout1_parameter_.clipping_width =
             (int)area_clipping_width.Value;
         }
         private void area_clipping_height_ValueChanged(object sender, EventArgs e)
         {
-            layout1_parameter_.clipping_height = (int)
+            viewModel.layout1_parameter_.clipping_height = (int)
             area_clipping_height.Value;
         }
         private void option_show_mouse_cursor_CheckedChanged(object sender, EventArgs e)
         {
             if (option_show_mouse_cursor.Checked)
             {
-                layout1_parameter_.show_cursor = 1;
+                viewModel.layout1_parameter_.show_cursor = 1;
             }
             else
             {
-                layout1_parameter_.show_cursor = 0;
+                viewModel.layout1_parameter_.show_cursor = 0;
             }
         }
         private void option_show_layered_window_CheckedChanged(object sender, EventArgs e)
         {
             if (option_show_layered_window.Checked)
             {
-                layout1_parameter_.show_layered_window = 1;
+                viewModel.layout1_parameter_.show_layered_window = 1;
             }
             else
             {
-                layout1_parameter_.show_layered_window = 0;
+                viewModel.layout1_parameter_.show_layered_window = 0;
             }
         }
         private void option_keep_aspect_ratio_CheckedChanged(object sender, EventArgs e)
         {
             if (option_keep_aspect_ratio.Checked)
             {
-                layout1_parameter_.keep_aspect_ratio = 1;
+                viewModel.layout1_parameter_.keep_aspect_ratio = 1;
             }
             else
             {
-                layout1_parameter_.keep_aspect_ratio = 0;
+                viewModel.layout1_parameter_.keep_aspect_ratio = 0;
             }
         }
         private void option_enable_enlargement_CheckedChanged(object sender, EventArgs e)
         {
             if (option_enable_enlargement.Checked)
             {
-                layout1_parameter_.stretch = 1;
+                viewModel.layout1_parameter_.stretch = 1;
             }
             else
             {
-                layout1_parameter_.stretch = 0;
+                viewModel.layout1_parameter_.stretch = 0;
             }
         }
         private void option_over_sampling_CheckedChanged(object sender, EventArgs e) { }
         private void option_thread_num_ValueChanged(object sender, EventArgs e) { }
         private void option_resize_method_combo_SelectedIndexChanged(object sender, EventArgs e)
         {
-            layout1_parameter_.sws_flags =(int)(
-                (ResizeMethod)                option_resize_method_combo.SelectedValue).SWScaleFlags;
+            viewModel.layout1_parameter_.sws_flags = (int)(
+                (ResizeMethod)option_resize_method_combo.SelectedValue).SWScaleFlags;
         }
         private void target_area_select_Click(object sender, EventArgs e)
         {

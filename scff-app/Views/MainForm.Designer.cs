@@ -102,6 +102,7 @@
             this.kVersion = new System.Windows.Forms.Label();
             this.kGreenPanel = new System.Windows.Forms.Panel();
             this.layout_profile_combo = new System.Windows.Forms.ComboBox();
+            this.mainViewModelBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.main_menu.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.layout_bound_height)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.layout_bound_width)).BeginInit();
@@ -122,6 +123,7 @@
             this.kOption.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.option_thread_num)).BeginInit();
             this.kGreenPanel.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.mainViewModelBindingSource)).BeginInit();
             this.SuspendLayout();
             // 
             // layout_layout
@@ -206,7 +208,7 @@
             this.english_item.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
             this.english_item.Enabled = false;
             this.english_item.Name = "english_item";
-            this.english_item.Size = new System.Drawing.Size(152, 22);
+            this.english_item.Size = new System.Drawing.Size(124, 22);
             this.english_item.Text = "English";
             // 
             // external_item
@@ -214,7 +216,7 @@
             this.external_item.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
             this.external_item.Enabled = false;
             this.external_item.Name = "external_item";
-            this.external_item.Size = new System.Drawing.Size(152, 22);
+            this.external_item.Size = new System.Drawing.Size(124, 22);
             this.external_item.Text = "External";
             // 
             // layout_bound_height
@@ -668,7 +670,7 @@
             this.layout_list.MultiSelect = false;
             this.layout_list.Name = "layout_list";
             this.layout_list.ShowGroups = false;
-            this.layout_list.Size = new System.Drawing.Size(189, 245);
+            this.layout_list.Size = new System.Drawing.Size(192, 245);
             this.layout_list.SmallImageList = this.scff_icons;
             this.layout_list.TabIndex = 0;
             this.layout_list.TileSize = new System.Drawing.Size(160, 30);
@@ -732,7 +734,7 @@
             // layout_strip_remove
             // 
             this.layout_strip_remove.Name = "layout_strip_remove";
-            this.layout_strip_remove.Size = new System.Drawing.Size(152, 22);
+            this.layout_strip_remove.Size = new System.Drawing.Size(124, 22);
             this.layout_strip_remove.Text = "Remove";
             // 
             // status_status
@@ -954,7 +956,11 @@
             this.layout_profile_combo.Size = new System.Drawing.Size(130, 20);
             this.layout_profile_combo.TabIndex = 11;
             // 
-            // Form1
+            // mainViewModelBindingSource
+            // 
+            this.mainViewModelBindingSource.DataSource = typeof(ScffApp.ViewModels.MainViewModel);
+            // 
+            // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -967,12 +973,12 @@
             this.Controls.Add(this.splitContainer1);
             this.Controls.Add(this.kGreenPanel);
             this.Controls.Add(this.layout_profile_combo);
+            this.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.mainViewModelBindingSource, "Title", true));
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.MaximumSize = new System.Drawing.Size(488, 500);
             this.MinimumSize = new System.Drawing.Size(300, 500);
-            this.Name = "Form1";
-            this.Text = "SCFF DirectShow Filter Ver.0.0.1";
+            this.Name = "MainForm";
             this.Shown += new System.EventHandler(this.Form1_Shown);
             this.Click += new System.EventHandler(this.layout_add_Click);
             this.main_menu.ResumeLayout(false);
@@ -999,6 +1005,7 @@
             this.kOption.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.option_thread_num)).EndInit();
             this.kGreenPanel.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.mainViewModelBindingSource)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -1075,6 +1082,7 @@
         private System.Windows.Forms.Label kVersion;
         private System.Windows.Forms.Panel kGreenPanel;
         private System.Windows.Forms.ComboBox layout_profile_combo;
+        private System.Windows.Forms.BindingSource mainViewModelBindingSource;
 
 
 

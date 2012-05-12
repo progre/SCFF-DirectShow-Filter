@@ -1,4 +1,4 @@
-﻿namespace ScffApp
+﻿namespace ScffApp.Views
 {
     partial class AreaSelectForm
     {

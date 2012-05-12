@@ -29,11 +29,14 @@ using System.Windows.Forms;
 using System.Collections;
 using System.Runtime.InteropServices;
 using scff_interprocess;
+using ScffApp.ViewModels;
 
 namespace ScffApp.Views
 {
     public partial class MainForm : Form
     {
+        private MainViewModel viewModel;
+
         [DllImport("kernel32")]
         private static extern bool GetVersionEx(ref OSVERSIONINFO osvi);
         [StructLayout(LayoutKind.Sequential)]
@@ -55,7 +58,11 @@ namespace ScffApp.Views
 
         public MainForm()
         {
+            viewModel = new MainViewModel();
+
             InitializeComponent();
+
+            mainViewModelBindingSource.Add(viewModel);
 
             can_use_dwmapi_dll_ = false;
             was_dwm_enabled_on_start_ = false;

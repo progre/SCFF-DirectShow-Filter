@@ -65,6 +65,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Commons\ViewModels\ViewModelBase.cs" />
+    <Compile Include="Commons\Views\Forms\DragMover.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="Views\AreaSelectForm.cs">
       <SubType>Form</SubType>

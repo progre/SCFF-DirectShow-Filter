@@ -32,7 +32,7 @@ using scff_interprocess;
 
 namespace ScffApp.Views
 {
-    public partial class Form1 : Form
+    public partial class MainForm : Form
     {
         [DllImport("kernel32")]
         private static extern bool GetVersionEx(ref OSVERSIONINFO osvi);
@@ -53,7 +53,7 @@ namespace ScffApp.Views
             public Byte wReserved;
         }
 
-        public Form1()
+        public MainForm()
         {
             InitializeComponent();
 

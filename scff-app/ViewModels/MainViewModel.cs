@@ -33,5 +33,34 @@ namespace ScffApp.ViewModels
         public Interprocess.LayoutParameter layout8_parameter_ = new Interprocess.LayoutParameter();
 
         public string Title { get { return "SCFF DirectShow Filter Ver.0.0.1"; } }
+
+        public MainViewModel()
+        {
+            can_use_dwmapi_dll_ = false;
+            was_dwm_enabled_on_start_ = false;
+            interprocess_ = null;
+
+            // DWMAPI.DLLが利用可能かどうか調べる
+            var os = Environment.OSVersion;
+            if (os.Platform == PlatformID.Win32NT && os.Version.Major >= 6)
+            {
+                can_use_dwmapi_dll_ = true;
+            }
+
+            // プロセス間通信に必要なオブジェクトの生成
+            interprocess_ = new Interprocess();
+            // レイアウトパラメータを格納するためのオブジェクトを生成
+            layout1_parameter_ = new Interprocess.LayoutParameter();
+            layout2_parameter_ = new Interprocess.LayoutParameter();
+            layout3_parameter_ = new Interprocess.LayoutParameter();
+            layout4_parameter_ = new Interprocess.LayoutParameter();
+            layout5_parameter_ = new Interprocess.LayoutParameter();
+            layout6_parameter_ = new Interprocess.LayoutParameter();
+            layout7_parameter_ = new Interprocess.LayoutParameter();
+            layout8_parameter_ = new Interprocess.LayoutParameter();
+
+            // 編集中のレイアウトインデックス
+            editing_layout_index_ = 0;
+        }
     }
 }

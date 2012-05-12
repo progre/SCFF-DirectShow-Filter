@@ -45,33 +45,9 @@ namespace ScffApp.Views
 
             mainViewModelBindingSource.Add(viewModel);
 
-            viewModel.can_use_dwmapi_dll_ = false;
-            viewModel.was_dwm_enabled_on_start_ = false;
-            viewModel.interprocess_ = null;
-
-            // DWMAPI.DLLが利用可能かどうか調べる
-            if (System.Environment.OSVersion.Platform == PlatformID.Win32NT && System.Environment.OSVersion.Version.Major >= 6)
-            {
-                viewModel.can_use_dwmapi_dll_ = true;
-            }
-
-            // プロセス間通信に必要なオブジェクトの生成
-            viewModel.interprocess_ = new Interprocess();
-            // レイアウトパラメータを格納するためのオブジェクトを生成
-            viewModel.layout1_parameter_ = new Interprocess.LayoutParameter();
-            viewModel.layout2_parameter_ = new Interprocess.LayoutParameter();
-            viewModel.layout3_parameter_ = new Interprocess.LayoutParameter();
-            viewModel.layout4_parameter_ = new Interprocess.LayoutParameter();
-            viewModel.layout5_parameter_ = new Interprocess.LayoutParameter();
-            viewModel.layout6_parameter_ = new Interprocess.LayoutParameter();
-            viewModel.layout7_parameter_ = new Interprocess.LayoutParameter();
-            viewModel.layout8_parameter_ = new Interprocess.LayoutParameter();
-
             // コントロールの準備
             BuildResizeMethodCombobox();
 
-            // 編集中のレイアウトインデックス
-            viewModel.editing_layout_index_ = 0;
             // ListViewを選択する
             layout_list.Items[viewModel.editing_layout_index_].Selected = true;
             layout_list.Select();

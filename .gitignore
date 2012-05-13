@@ -17,6 +17,7 @@
 /ext/ffmpeg/x86/include
 /ext/ffmpeg/x86/doc
 /ext/ffmpeg/x86/bin
+/ext/gtest/*
 /ipch
 *.suo
 /doc/html

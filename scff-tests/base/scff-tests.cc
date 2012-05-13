@@ -18,8 +18,9 @@
 
 #include "base/scff-tests.h"
 #include <libavfilter/drawutils.h>
+#include <gtest/gtest.h>
 
-int _tmain(int argc, _TCHAR* argv[]) {
+TEST(ff_draw_color_test, PIX_FMT_RGB0) {
   FFDrawContext* test_context = new FFDrawContext;
   FFDrawColor* test_color = new FFDrawColor;
   uint8_t test_fill_color[4] = {255, 255, 255, 255};
@@ -27,10 +28,8 @@ int _tmain(int argc, _TCHAR* argv[]) {
   ff_draw_init(test_context, PIX_FMT_RGB0, 0);
   ff_draw_color(test_context, test_color, test_fill_color);
 
-  printf("Hello, World! %d\n", test_context->format);
-  getchar();
+  EXPECT_EQ(test_context->format, PIX_FMT_RGB0);
 
+  delete test_color;
   delete test_context;
-
-  return 0;
 }
